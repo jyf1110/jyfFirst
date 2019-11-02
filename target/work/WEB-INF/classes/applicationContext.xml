@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+  <context:property-placeholder location="classpath:dbconfig.properties"/>
+  <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+    <property name="url" value="${url}"/>
+    <property name="username" value="${user}"/>
+    <property name="password" value="${password}"/>
+    <property name="initialSize" value="${initialSize}"/>
+    <property name="minIdle" value="${minIdle}"/>
+    <property name="maxActive" value="${maxActive}"/>
+    <property name="maxWait" value="${maxWait}"/>
+    <property name="filters" value="${filters}"/>
+  </bean>
+  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="typeAliasesPackage" value="com.waysoft.work.pojo"/>
+    <property name="mapperLocations" value="classpath:mapping/*.xml"/>
+  </bean>
+  <!--创建代理切入织面-->
+  <aop:aspectj-autoproxy/>
+  <!--mapper接口-->
+  <mybatis-spring:scan base-package="com.waysoft.work.mapper"/>
+  <!--事务的注解驱动-->
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+  <task:annotation-driven />
+  <context:component-scan base-package="com.waysoft.work.service"/>
+
+
+
+</beans>
